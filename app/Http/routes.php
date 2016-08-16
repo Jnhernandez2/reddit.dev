@@ -28,7 +28,11 @@ Route::get('/uppercase/{word}', function ($word) {
 });
 
 Route::get('/increment/{number}', function ($number) {
-	return $number + 1;
+	
+	$increment = $number + 1;
+	$data = compact('increment');
+
+	return view('increment', $data);
 });
 
 Route::get('/add/{number1}/{number2}', function ($number1, $number2) {
