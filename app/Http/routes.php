@@ -20,7 +20,11 @@ Route::get('/', function () {
 // });
 
 Route::get('/uppercase/{word}', function ($word) {
-	return strtoupper("$word");
+
+	$upper = strtoupper("$word");
+	$data = compact('upper', 'word');
+
+	return view('uppercase', $data);
 });
 
 Route::get('/increment/{number}', function ($number) {
