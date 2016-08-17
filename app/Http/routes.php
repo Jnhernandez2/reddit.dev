@@ -1,5 +1,6 @@
 <?php
 
+use App\Post;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,29 +12,17 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@showWelcome');
 
 // Route::get('/sayhello/{name}', function ($name) {
 // 	return "HEY $name! GO FUCK YOURSELF!";
 // });
 
-Route::get('/uppercase/{word}', function ($word) {
+Route::get('/roll-dice/{guess}', 'HomeController@rollDice');
 
-	$upper = strtoupper("$word");
-	$data = compact('upper', 'word');
+Route::get('/uppercase/{word}', 'HomeController@upperCase');
 
-	return view('uppercase', $data);
-});
-
-Route::get('/increment/{number}', function ($number) {
-	
-	$increment = $number + 1;
-	$data = compact('increment');
-
-	return view('increment', $data);
-});
+Route::get('/increment/{number}', 'HomeController@increment');
 
 Route::get('/add/{number1}/{number2}', function ($number1, $number2) {
 	return $number1 + $number2;
@@ -55,19 +44,34 @@ Route::get('/sayhello/{firstName}/{lastName}', function($firstName, $lastName)
     return view('my-first-view', $data);
 });
 
-Route::get('/rolldice/{guess}', function($guess) {
+Route::get('/rolldice/{guess}', 'HomeController@rollDice');
 
-	// $dice = [1, 2, 3, 4, 5, 6];
+// Route::get('/posts', 'PostsController@index');
+// Route::get('/posts/create', 'PostsController@create');
+// Route::post('/posts', 'PostsController@store');
+// Route::get('/posts/{post}', 'PostsController@show');
+// Route::get('/posts/{post}/edit', 'PostsController@edit');
+// Route::put('/posts/{post}', 'PostsController@update');
+// Route::delete('/posts/{post}', "PostsController@destroy");
 
-	$roll = mt_rand(1, 6);
+//This one line does the same thing as ALL OF THAT^^^^^
 
-	$data = compact('roll', 'guess');
+Route::resource('posts', 'PostsController');
 
-	// $data = [
-	// 	'roll' => $roll,
-	// 	'guess' => $guess
+Route::get('orm-test', function() {
 
-	// ];
+	$post1 = new Post();
+	$post1->title = 'Eloquent is awesome!';
+	$post1->url='https://laravel.com/docs/5.1/eloquent';
+	$post1->content  = 'It is super easy to create a new post.';
+	$post1->created_by = 1;
+	$post1->save();
 
-	return view('roll-dice', $data);
+	$post2 = new Post();
+	$post2->title = 'Eloquent is really easy!';
+	$post2->url='https://laravel.com/docs/5.1/eloquent';
+	$post2->content = 'It is super easy to create a new post.';
+	$post2->created_by = 1;
+	$post2->save();
+
 });
