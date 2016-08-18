@@ -17,7 +17,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::paginate(3);
         $data = compact('posts');
 
         return view('posts.index', $data);
@@ -41,6 +41,9 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
+
+        $this->validate($request, Post::rules());
+
         $post = new Post;
         $post->title = $request->input('title');
         $post->url = $request->input('url');
@@ -85,7 +88,8 @@ class PostsController extends Controller
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
-        $post->title = "New Title!";
+        $post->title = $request->input('title');
+        $post->
         $post->save();
         return $post;
     }

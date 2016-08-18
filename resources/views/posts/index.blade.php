@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('content')
-	<table>
+	
 @foreach ($posts as $post)
 	<h3>Title</h3>	
     <div> {{ $post->title }} </div>
@@ -11,6 +11,7 @@
     <div> {{ $post->content }} </div><br>
     <div>---------------------------------------------------------<div>
 @endforeach
-	</table>
+{!! $posts->render() !!}
+	
 	
 @stop
