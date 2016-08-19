@@ -50,6 +50,7 @@ class PostsController extends Controller
         $post->content = $request->input('content');
         $post->created_by = 1;
         $post->save();
+        //$request->session()->flash('message', 'You did it!');
         return redirect( action('PostsController@index'));
     }
 
@@ -87,11 +88,15 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $this->validate($request, Post::rules());
+
         $post = Post::find($id);
         $post->title = $request->input('title');
-        $post->
+        $post->url = $request->input('url');
+        $post->content = $request->input('content');
         $post->save();
-        return $post;
+        return redirect()->action('PostsController@show');
     }
 
     /**
