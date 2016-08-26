@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Post;
+use Illuminate\Support\Facades\Log;
+use App\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class PostsController extends Controller
 {
@@ -15,12 +19,18 @@ class PostsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function __construct()
     {
-        $posts = Post::paginate(3);
-        $data = compact('posts');
+        $this->middleware('auth', ['except' => ['index']]);
+    }
+    public function index(Request $request)
+    {
+        // $searchItem = $request->input('search');
+        $posts = Post::with('user');
+        
+        //$data = compact('posts');
 
-        return view('posts.index', $data);
+        return view('posts.index')->with('posts', Post::orderBy('created_at', 'desc')->paginate(5));
     }
 
     /**
@@ -48,9 +58,9 @@ class PostsController extends Controller
         $post->title = $request->input('title');
         $post->url = $request->input('url');
         $post->content = $request->input('content');
-        $post->created_by = 1;
+        $post->created_by = Auth::user()->id;
         $post->save();
-        //$request->session()->flash('message', 'You did it!');
+        $request->session()->flash('message', 'Your post was created!');
         return redirect( action('PostsController@index'));
     }
 
@@ -63,6 +73,12 @@ class PostsController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
+
+        if (!$post) {
+            Log::info("Post with $id not found.");
+            abort(404);
+        }
+
         $data = compact('post');
 
         return view('posts.show', $data);
@@ -76,7 +92,16 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        return "This is your Edit Page!";
+        $post = Post::find($id);
+
+        if (!$post) {
+            Log::info("Post with $id not found for edit.");
+            abort(404);
+        }
+
+        $data = compact('post');
+
+        return view('posts.edit', $data);
     }
 
     /**
@@ -92,11 +117,18 @@ class PostsController extends Controller
         $this->validate($request, Post::rules());
 
         $post = Post::find($id);
+        //dd($post);
+        if (!$post) {
+            Log::info("Post with $id not found for edit.");
+            abort(404);
+        }
+
         $post->title = $request->input('title');
         $post->url = $request->input('url');
         $post->content = $request->input('content');
         $post->save();
-        return redirect()->action('PostsController@show');
+        $request->session()->flash('message', 'Your post has been updated!');
+        return redirect()->action('PostsController@show', $post->id);
     }
 
     /**
@@ -105,8 +137,27 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        return "This is your Destroy Page!";
+
+        $post = Post::find($id);
+
+        if (!$post) {
+            Log::info("Post with $id not found for delete.");
+            abort(404);
+        }
+
+        $post->delete();
+        $request->session()->flash('message', 'Your post has been deleted!');
+        return redirect()->action('UsersController@index');
+    }
+
+    public function searchByPostOrUser(Request $request) {
+
+        $searchItem = $request->input('search');
+
+        $posts = Post::search($searchItem)->with('user')->paginate(10);
+        return view('posts.index')->with('posts', $posts);
+
     }
 }

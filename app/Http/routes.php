@@ -1,6 +1,7 @@
 <?php
 
 use App\Post;
+use App\Http\Controllers\Auth\AuthController;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,6 +13,7 @@ use App\Post;
 |
 */
 
+//Laravel Main Page
 Route::get('/', 'HomeController@showWelcome');
 
 // Route::get('/sayhello/{name}', function ($name) {
@@ -55,9 +57,12 @@ Route::get('/rolldice/{guess}', 'HomeController@rollDice');
 // Route::delete('/posts/{post}', "PostsController@destroy");
 
 //This one line does the same thing as ALL OF THAT^^^^^
-
+//Routes for ALL posts.
 Route::resource('posts', 'PostsController');
+Route::get('/search', 'PostsController@searchByPostOrUser');
 
+
+//Test Route
 Route::get('orm-test', function() {
 
 	$post1 = new Post();
@@ -75,3 +80,22 @@ Route::get('orm-test', function() {
 	$post2->save();
 
 });
+
+//Authentication Routes
+Route::get('auth/login', 'Auth\AuthController@getLogin');
+Route::post('auth/login', 'Auth\AuthController@postLogin');
+Route::get('auth/logout', 'Auth\AuthController@getLogout');
+
+//Again, this line does all that ^^^^ and below.
+//Route::resource('auth', 'AuthController');
+
+
+//Registration Routes
+Route::get('auth/register', 'Auth\AuthController@getRegister');
+Route::post('auth/register', 'Auth\AuthController@postRegister');
+
+
+Route::put('users/password/{id}', 'UsersController@updatePassword');
+Route::get('users/password/{id}', 'UsersController@editPassword');
+Route::resource('users', 'UsersController');
+
